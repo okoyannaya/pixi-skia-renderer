@@ -2,6 +2,15 @@
 
 ТЗ требует экспорт сцены в PDF через Skia PDF backend. Стандартный `canvaskit-wasm@0.40.0` подходит для экранного Skia preview, но не экспортирует `SkPDF` / `SkDocument` в JavaScript. Поэтому нужен custom CanvasKit wasm.
 
+В проект уже добавлены собранные артефакты:
+
+```text
+public/wasm/custom-canvaskit.js
+public/wasm/custom-canvaskit.wasm
+```
+
+`src/skia/loadCanvasKit.ts` сначала загружает эту сборку. Если файлов нет, приложение fallback-ом использует обычный npm `canvaskit-wasm`, но экспорт PDF тогда будет недоступен.
+
 Официальная база:
 
 - CanvasKit - Skia в WebAssembly: https://docs.skia.org/docs/user/modules/canvaskit/
@@ -45,6 +54,7 @@ modules/canvaskit/pdf_bindings.cpp
 #include "include/core/SkDocument.h"
 #include "include/core/SkStream.h"
 #include "include/docs/SkPDFDocument.h"
+#include "include/docs/SkPDFJpegHelpers.h"
 #include "modules/canvaskit/WasmCommon.h"
 
 #include <emscripten/bind.h>
@@ -53,7 +63,7 @@ modules/canvaskit/pdf_bindings.cpp
 class PdfDocumentWrapper {
  public:
   PdfDocumentWrapper() {
-    document_ = SkPDF::MakeDocument(&stream_);
+    document_ = SkPDF::MakeDocument(&stream_, SkPDF::JPEG::MetadataWithCallbacks());
   }
 
   SkCanvas* beginPage(float width, float height) {
@@ -88,6 +98,12 @@ EMSCRIPTEN_BINDINGS(CanvasKitPdf) {
 
 Это sketch, его нужно адаптировать к конкретному commit Skia и существующим CanvasKit helper types.
 
+В актуальной Skia важно передавать `SkPDF::JPEG::MetadataWithCallbacks()`. Без этого `SkPDF::MakeDocument` падает с ошибкой:
+
+```text
+Must set both a jpegDecoder and jpegEncoder to create PDFs
+```
+
 ## Build Steps
 
 Рабочий вариант лучше делать вне приложения, потому что исходники Skia тяжелые:
@@ -111,7 +127,7 @@ skia_use_libpng_decode=true
 skia_use_libpng_encode=true
 ```
 
-Если PDF со sprite PNG/JPEG потребует дополнительные кодеки:
+Для PDF backend нужны zlib и JPEG callbacks:
 
 ```text
 skia_use_libjpeg_turbo_decode=true
@@ -122,7 +138,7 @@ CanvasKit обычно собирается из:
 
 ```bash
 cd modules/canvaskit
-./compile.sh
+./compile.sh cpu no_skottie no_font no_alias_font no_embedded_font no_encode_webp
 ```
 
 Финальные артефакты нужно скопировать в приложение:
@@ -131,6 +147,14 @@ cd modules/canvaskit
 public/wasm/custom-canvaskit.js
 public/wasm/custom-canvaskit.wasm
 ```
+
+Smoke-check после сборки:
+
+```bash
+node -e "const init=require('./out/canvaskit_wasm/canvaskit.js'); init({locateFile:f=>'./out/canvaskit_wasm/'+f}).then(CK=>{const d=new CK.PdfDocument(); const c=d.beginPage(200,100); const p=new CK.Paint(); p.setColor(CK.Color(255,0,0,1)); c.drawRect(CK.LTRBRect(10,10,190,90),p); d.endPage(); const b=d.close(); console.log(Buffer.from(b.slice(0,4)).toString(), b.length);})"
+```
+
+Ожидаемый результат начинается с `%PDF`.
 
 ## Acceptance Check
 

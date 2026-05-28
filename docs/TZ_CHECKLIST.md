@@ -26,11 +26,11 @@
 ## PDF
 
 - [x] Проверено, что стандартный `canvaskit-wasm@0.40.0` не экспортирует PDF API.
-- [ ] Подготовлена custom CanvasKit/Skia wasm-сборка с PDF backend.
-- [ ] PDF экспорт использует Skia PDF backend.
-- [ ] Экспортируемые `PIXI.Graphics` остаются векторными в PDF.
-- [ ] `PIXI.Sprite` экспортируется как bitmap.
-- [ ] PDF экспорт использует тот же scene renderer, что и Skia preview.
+- [x] Подготовлена custom CanvasKit/Skia wasm-сборка с PDF backend.
+- [x] PDF экспорт использует Skia PDF backend.
+- [x] Экспортируемые `PIXI.Graphics` остаются векторными в PDF.
+- [x] `PIXI.Sprite` экспортируется как bitmap.
+- [x] PDF экспорт использует тот же scene renderer, что и Skia preview.
 
 ## Events And UI
 

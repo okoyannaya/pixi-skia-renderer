@@ -105,11 +105,43 @@ function drawPolygon(
   paint: import('canvaskit-wasm').Paint,
   context: SkiaRendererContext,
 ): void {
-  const path = new context.canvasKit.Path()
   const [firstX, firstY] = shape.points
 
   if (firstX === undefined || firstY === undefined) {
-    path.delete()
+    return
+  }
+
+  const path = createPathFromPolygon(shape, context.canvasKit)
+  context.canvas.drawPath(path, paint)
+  path.delete()
+}
+
+function createPathFromPolygon(
+  shape: PIXI.Polygon,
+  canvasKit: SkiaRendererContext['canvasKit'],
+): import('canvaskit-wasm').Path {
+  const canvasKitWithPathBuilder = canvasKit as SkiaRendererContext['canvasKit'] & {
+    PathBuilder?: new () => PathBuilderLike
+  }
+
+  if (canvasKitWithPathBuilder.PathBuilder) {
+    const builder = new canvasKitWithPathBuilder.PathBuilder()
+
+    appendPolygonToPath(builder, shape)
+
+    return builder.detachAndDelete()
+  }
+
+  const path = new canvasKit.Path()
+  appendPolygonToPath(path, shape)
+
+  return path
+}
+
+function appendPolygonToPath(path: MutablePathLike, shape: PIXI.Polygon): void {
+  const [firstX, firstY] = shape.points
+
+  if (firstX === undefined || firstY === undefined) {
     return
   }
 
@@ -127,7 +159,14 @@ function drawPolygon(
   if (shape.closeStroke) {
     path.close()
   }
+}
 
-  context.canvas.drawPath(path, paint)
-  path.delete()
+interface MutablePathLike {
+  moveTo(x: number, y: number): unknown
+  lineTo(x: number, y: number): unknown
+  close(): unknown
+}
+
+interface PathBuilderLike extends MutablePathLike {
+  detachAndDelete(): import('canvaskit-wasm').Path
 }

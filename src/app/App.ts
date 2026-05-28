@@ -1,5 +1,6 @@
 import type { Surface } from 'canvaskit-wasm'
 
+import { exportPixiContainerToPdf } from '../export/PdfExporter'
 import { SkiaPointerBridge } from '../interaction/SkiaPointerBridge'
 import { inspectCanvasKitPdfSupport } from '../pdf/pdfSpike'
 import { createPixiApplication } from '../pixi/createPixiApplication'
@@ -109,7 +110,13 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       const report = await inspectCanvasKitPdfSupport()
 
       if (report.pdfBackendAvailable) {
-        logEvent('PDF backend found, export implementation is next')
+        updateWorldTransforms(pixiApp.stage)
+        exportPixiContainerToPdf(canvasKit, skiaRenderer, scene.container, {
+          filename: 'pixi-skia-scene.pdf',
+          width: SCENE_WIDTH,
+          height: SCENE_HEIGHT,
+        })
+        logEvent('PDF exported')
       } else {
         logEvent('PDF backend requires custom CanvasKit build')
       }
