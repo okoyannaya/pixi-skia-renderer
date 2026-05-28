@@ -1,6 +1,6 @@
 :root {
   font-family: Arial, sans-serif;
-  color: #1b1b1b;
+  color: #171717;
   background: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,6 +19,127 @@ body {
   min-width: 320px;
 }
 
+button {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 16px;
+  border: 2px solid #333333;
+  background: #ffdd45;
+  color: #161616;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffe778;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 #app {
   min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 36px;
+  align-items: start;
+  min-height: 100vh;
+  padding: 92px 70px;
+}
+
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.canvas-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 28px;
+}
+
+.scene-card {
+  position: relative;
+  min-height: 432px;
+  border: 2px solid #555555;
+  background: #eeeeee;
+  overflow: hidden;
+}
+
+.scene-card h1,
+.scene-card p {
+  position: absolute;
+  left: 44px;
+  z-index: 1;
+  margin: 0;
+  pointer-events: none;
+}
+
+.scene-card h1 {
+  top: 54px;
+  font-size: 48px;
+  font-weight: 400;
+}
+
+.scene-card p {
+  top: 126px;
+  font-size: 44px;
+}
+
+.canvas-host,
+.render-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.canvas-host canvas,
+.render-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.log-panel {
+  margin-top: 8px;
+  border: 1px solid #d0d0d0;
+  background: #f8f8f8;
+  padding: 12px;
+}
+
+.log-panel h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.log-panel pre {
+  min-height: 120px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (max-width: 1180px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+  }
+
+  .controls-panel {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 780px) {
+  .canvas-panel {
+    grid-template-columns: 1fr;
+  }
 }
