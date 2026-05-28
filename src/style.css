@@ -65,31 +65,32 @@ button:disabled {
 }
 
 .scene-card {
-  position: relative;
-  min-height: 432px;
   border: 2px solid #555555;
   background: #eeeeee;
   overflow: hidden;
 }
 
-.scene-card h1,
-.scene-card p {
-  position: absolute;
-  left: 44px;
-  z-index: 1;
-  margin: 0;
-  pointer-events: none;
+.scene-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 14px 18px;
+  border-bottom: 2px solid #555555;
+  background: #ffffff;
 }
 
 .scene-card h1 {
-  top: 54px;
-  font-size: 48px;
-  font-weight: 400;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 .scene-card p {
-  top: 126px;
-  font-size: 44px;
+  margin: 0;
+  font-size: 16px;
+  color: #555555;
 }
 
 .canvas-host,

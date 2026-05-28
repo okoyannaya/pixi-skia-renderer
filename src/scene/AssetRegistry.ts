@@ -1,14 +1,12 @@
 import type { CanvasKit, Image } from 'canvaskit-wasm'
 import type * as PIXI from 'pixi.js-legacy'
 
-import { decodePngDataUrl } from './embeddedPng'
-
 export class AssetRegistry {
   private readonly encodedPngByTexture = new WeakMap<PIXI.Texture, Uint8Array>()
   private readonly skImageByTexture = new WeakMap<PIXI.Texture, Image>()
 
-  registerPngTexture(texture: PIXI.Texture, dataUrl: string): void {
-    this.encodedPngByTexture.set(texture, decodePngDataUrl(dataUrl))
+  registerPngTexture(texture: PIXI.Texture, bytes: Uint8Array): void {
+    this.encodedPngByTexture.set(texture, bytes)
   }
 
   getSkImage(canvasKit: CanvasKit, texture: PIXI.Texture): Image | null {

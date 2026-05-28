@@ -27,14 +27,18 @@ export function mountApp(root: HTMLElement): void {
 
       <section class="canvas-panel">
         <article class="scene-card">
-          <h1>Канвас 1</h1>
-          <p>Pixi.js</p>
+          <header class="scene-card-header">
+            <h1>Канвас 1</h1>
+            <p>Pixi.js</p>
+          </header>
           <div id="pixi-host" class="canvas-host"></div>
         </article>
 
         <article class="scene-card">
-          <h1>Канвас 2</h1>
-          <p>Skia</p>
+          <header class="scene-card-header">
+            <h1>Канвас 2</h1>
+            <p>Skia</p>
+          </header>
           <canvas
             id="skia-canvas"
             class="render-canvas"
@@ -67,7 +71,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   const pixiApp = createPixiApplication()
   pixiHost.appendChild(pixiApp.view)
 
-  let scene = createDemoScene(logEvent)
+  let scene = await createDemoScene(logEvent)
   pixiApp.stage.addChild(scene.container)
 
   const canvasKit = await loadCanvasKit()
@@ -94,13 +98,21 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     render()
   })
 
-  resetButton.addEventListener('click', () => {
-    pixiApp.stage.removeChild(scene.container)
-    scene = createDemoScene(logEvent)
-    pixiApp.stage.addChild(scene.container)
-    skiaRenderer = createPixiToSkiaRenderer(canvasKit, scene.assets)
-    logEvent('scene reset')
-    render()
+  resetButton.addEventListener('click', async () => {
+    resetButton.disabled = true
+
+    try {
+      pixiApp.stage.removeChild(scene.container)
+      scene = await createDemoScene(logEvent)
+      pixiApp.stage.addChild(scene.container)
+      skiaRenderer = createPixiToSkiaRenderer(canvasKit, scene.assets)
+      logEvent('scene reset')
+      render()
+    } catch (error) {
+      logEvent(formatError(error))
+    } finally {
+      resetButton.disabled = false
+    }
   })
 
   exportPdfButton.addEventListener('click', async () => {

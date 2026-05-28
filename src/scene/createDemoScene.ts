@@ -1,14 +1,15 @@
 import * as PIXI from 'pixi.js-legacy'
 
 import { AssetRegistry } from './AssetRegistry'
-import { EMBEDDED_PNG_DATA_URL } from './embeddedPng'
+
+const SPRITE_IMAGE_URL = '/images/b.png'
 
 export interface DemoScene {
   container: PIXI.Container
   assets: AssetRegistry
 }
 
-export function createDemoScene(logEvent: (message: string) => void): DemoScene {
+export async function createDemoScene(logEvent: (message: string) => void): Promise<DemoScene> {
   const assets = new AssetRegistry()
   const mainContainer = new PIXI.Container()
   const subContainer = new PIXI.Container()
@@ -39,13 +40,13 @@ export function createDemoScene(logEvent: (message: string) => void): DemoScene 
   subContainer.position.set(230, 105)
   subContainer.addChild(g3, g4)
 
-  const texture = PIXI.Texture.from(EMBEDDED_PNG_DATA_URL)
-  assets.registerPngTexture(texture, EMBEDDED_PNG_DATA_URL)
+  const { bytes, texture } = await loadPngTexture(SPRITE_IMAGE_URL)
+  assets.registerPngTexture(texture, bytes)
 
   const sprite = new PIXI.Sprite(texture)
-  sprite.position.set(330, 270)
-  sprite.width = 170
-  sprite.height = 90
+  sprite.position.set(330, 285)
+  sprite.width = 150
+  sprite.height = 150
   sprite.anchor.set(0.5)
   wirePointerEvents(sprite, 'sprite', logEvent)
 
@@ -55,6 +56,35 @@ export function createDemoScene(logEvent: (message: string) => void): DemoScene 
     container: mainContainer,
     assets,
   }
+}
+
+async function loadPngTexture(url: string): Promise<{ bytes: Uint8Array; texture: PIXI.Texture }> {
+  const [bytes, texture] = await Promise.all([fetchPngBytes(url), loadPixiTexture(url)])
+
+  return { bytes, texture }
+}
+
+async function fetchPngBytes(url: string): Promise<Uint8Array> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(`Failed to load sprite image "${url}".`)
+  }
+
+  return new Uint8Array(await response.arrayBuffer())
+}
+
+function loadPixiTexture(url: string): Promise<PIXI.Texture> {
+  const texture = PIXI.Texture.from(url)
+
+  if (texture.baseTexture.valid) {
+    return Promise.resolve(texture)
+  }
+
+  return new Promise((resolve, reject) => {
+    texture.baseTexture.once('loaded', () => resolve(texture))
+    texture.baseTexture.once('error', () => reject(new Error(`Failed to load Pixi texture "${url}".`)))
+  })
 }
 
 function wirePointerEvents(
