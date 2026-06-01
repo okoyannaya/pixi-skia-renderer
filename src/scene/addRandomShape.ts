@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 
+import { createLineHitArea, enablePointerTarget } from '../interaction/pointerTarget'
 import { SCENE_HEIGHT, SCENE_WIDTH } from '../shared/constants'
 
 export function addRandomShape(
@@ -19,13 +20,13 @@ export function addRandomShape(
     graphics.lineStyle(6, color, 1)
     graphics.moveTo(-55, -25)
     graphics.lineTo(55, 25)
+    graphics.hitArea = createLineHitArea({ x1: -55, y1: -25, x2: 55, y2: 25, width: 6 })
   }
 
   graphics.position.set(x, y)
   graphics.angle = -35 + Math.random() * 70
   graphics.scale.set(0.7 + Math.random() * 1.3)
-  graphics.eventMode = 'static'
-  graphics.cursor = 'pointer'
+  enablePointerTarget(graphics)
   graphics.on('pointerdown', () => logEvent('random shape pointerdown'))
   graphics.on('pointerup', () => logEvent('random shape pointerup'))
 

@@ -13,14 +13,14 @@
   - [x] translate;
   - [x] rotate / angle;
   - [x] scale.
-- [ ] Поддерживается `PIXI.Graphics`:
+- [x] Поддерживается `PIXI.Graphics`:
   - [x] `drawShape`;
   - [x] `moveTo`;
   - [x] `lineTo`;
   - [x] `drawRect`;
   - [x] fill;
   - [x] stroke;
-  - [ ] покрыть тестами и edge cases.
+  - [x] покрыть тестами и edge cases.
 - [x] Поддерживается `PIXI.Sprite` для PNG.
 
 ## PDF
@@ -34,8 +34,8 @@
 
 ## Events And UI
 
-- [ ] `pointerdown` работает на Pixi canvas.
-- [ ] `pointerup` работает на Pixi canvas.
+- [x] `pointerdown` работает на Pixi canvas.
+- [x] `pointerup` работает на Pixi canvas.
 - [x] `pointerdown` работает на Skia canvas через hit-test bridge.
 - [x] `pointerup` работает на Skia canvas через hit-test bridge.
 - [x] Есть кнопка "Сгенерировать случайную линию/фигуру".
@@ -46,7 +46,7 @@
 
 ## Delivery
 
-- [ ] Есть подробный README с запуском через `npm run`.
+- [x] Есть подробный README с запуском через `npm run`.
 - [ ] Проект загружен на GitHub.
 - [ ] Приложение опубликовано на бесплатном хостинге.
 - [ ] Приложен PDF, сгенерированный через Skia, с векторной графикой.

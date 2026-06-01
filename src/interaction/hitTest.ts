@@ -35,6 +35,10 @@ function hitTestRecursive(
     return null
   }
 
+  if (displayObject.hitArea) {
+    return containsHitArea(displayObject, point) ? displayObject : null
+  }
+
   if (displayObject instanceof PIXI.Graphics) {
     return displayObject.containsPoint(point) ? displayObject : null
   }
@@ -47,5 +51,22 @@ function hitTestRecursive(
 }
 
 function isInteractive(displayObject: PIXI.DisplayObject): boolean {
-  return displayObject.eventMode === 'static' || displayObject.eventMode === 'dynamic'
+  return (
+    displayObject.interactive ||
+    displayObject.eventMode === 'static' ||
+    displayObject.eventMode === 'dynamic'
+  )
+}
+
+function containsHitArea(
+  displayObject: PIXI.DisplayObject,
+  point: PIXI.IPointData,
+): boolean {
+  if (!displayObject.hitArea) {
+    return false
+  }
+
+  const localPoint = displayObject.worldTransform.applyInverse(point)
+
+  return displayObject.hitArea.contains(localPoint.x, localPoint.y)
 }

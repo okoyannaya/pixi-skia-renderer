@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import * as PIXI from 'pixi.js-legacy'
 
 import { hitTestDisplayObject } from './hitTest'
+import { createLineHitArea, enablePointerTarget } from './pointerTarget'
 
 class TestCanvasElement {
   width = 0
@@ -71,13 +72,39 @@ describe('hitTestDisplayObject', () => {
       graphics,
     )
   })
+
+  it('uses custom hit areas for stroked lines', () => {
+    const root = new PIXI.Container()
+    const graphics = new PIXI.Graphics()
+
+    graphics.lineStyle(10, 0xffffff, 1).moveTo(0, 0).lineTo(150, 100)
+    graphics.hitArea = createLineHitArea({ x1: 0, y1: 0, x2: 150, y2: 100, width: 10 })
+    graphics.position.set(40, 30)
+    graphics.angle = 25
+    enablePointerTarget(graphics)
+    root.addChild(graphics)
+    updateWorldTransforms(root)
+
+    expect(hitTestDisplayObject(root, graphics.worldTransform.apply(new PIXI.Point(75, 50)))).toBe(
+      graphics,
+    )
+    expect(
+      hitTestDisplayObject(root, graphics.worldTransform.apply(new PIXI.Point(75, 75))),
+    ).toBeNull()
+  })
 })
 
 function createRect(color: number): PIXI.Graphics {
   const graphics = new PIXI.Graphics()
   graphics.beginFill(color).drawRect(0, 0, 80, 80).endFill()
-  graphics.eventMode = 'static'
+  enablePointerTarget(graphics)
   graphics.on('pointerdown', vi.fn())
 
   return graphics
+}
+
+function updateWorldTransforms(container: PIXI.Container): void {
+  const cacheParent = container.enableTempParent()
+  container.updateTransform()
+  container.disableTempParent(cacheParent)
 }

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 
+import { createLineHitArea, enablePointerTarget } from '../interaction/pointerTarget'
 import { AssetRegistry } from './AssetRegistry'
 
 const SPRITE_IMAGE_URL = '/images/b.png'
@@ -30,10 +31,12 @@ export async function createDemoScene(logEvent: (message: string) => void): Prom
   wirePointerEvents(g2, 'g2', logEvent)
 
   g3.lineStyle(10, 0x111111, 1).moveTo(0, 0).lineTo(150, 100)
+  g3.hitArea = createLineHitArea({ x1: 0, y1: 0, x2: 150, y2: 100, width: 10 })
   g3.angle = -20
   wirePointerEvents(g3, 'g3', logEvent)
 
   g4.lineStyle(10, 0xffff00, 1).moveTo(0, 70).lineTo(150, -30)
+  g4.hitArea = createLineHitArea({ x1: 0, y1: 70, x2: 150, y2: -30, width: 10 })
   g4.angle = 20
   wirePointerEvents(g4, 'g4', logEvent)
 
@@ -92,8 +95,7 @@ function wirePointerEvents(
   name: string,
   logEvent: (message: string) => void,
 ): void {
-  object.eventMode = 'static'
-  object.cursor = 'pointer'
+  enablePointerTarget(object)
   object.on('pointerdown', () => logEvent(`${name} pointerdown`))
   object.on('pointerup', () => logEvent(`${name} pointerup`))
 }

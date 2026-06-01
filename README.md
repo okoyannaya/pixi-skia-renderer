@@ -112,7 +112,8 @@ Vite выведет локальный адрес preview-сервера.
 npm test
 ```
 
-Тесты проверяют hit-test логику для интерактивности на Skia canvas.
+Тесты проверяют hit-test логику для интерактивности на Skia canvas, базовый
+рендер Pixi -> Skia и экспорт Pixi-контейнера в PDF.
 
 ## Структура проекта
 
@@ -140,4 +141,3 @@ npm run build     # production-сборка
 npm run preview   # preview production-сборки
 npm test          # запуск тестов
 ```
-
